@@ -20,6 +20,35 @@ export default function App() {
   const [category, setCategory] = useState<Category | null>(null); const [item, setItem] = useState(0); const [photo, setPhoto] = useState(0); const [chosen, setChosen] = useState<string[]>([]); const [cart, setCart] = useState(false); const [zoom, setZoom] = useState(false); const [origin, setOrigin] = useState({ x: 50, y: 50 }); const [sending, setSending] = useState(false); const [message, setMessage] = useState(""); const [success, setSuccess] = useState(false); const [confetti, setConfetti] = useState(false);
   useEffect(() => { try { const saved = localStorage.getItem("haadiya-picks"); if (saved) setChosen(JSON.parse(saved)); } catch { localStorage.removeItem("haadiya-picks"); } }, []);
   useEffect(() => localStorage.setItem("haadiya-picks", JSON.stringify(chosen)), [chosen]);
+  useEffect(() => {
+    const visitKey = "furniture-visit-notified";
+
+    try {
+      if (sessionStorage.getItem(visitKey) === "yes") return;
+
+      // Set this before the request so React Strict Mode and quick refreshes
+      // cannot send duplicate visit events in the same browser session.
+      sessionStorage.setItem(visitKey, "yes");
+
+      fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          eventType: "page_visit",
+          page: window.location.href,
+          referrer: document.referrer || "Direct",
+          userAgent: navigator.userAgent,
+          language: navigator.language,
+        }),
+      }).catch(() => {
+        // Allow a later refresh to retry if the browser could not send it.
+        sessionStorage.removeItem(visitKey);
+      });
+    } catch {
+      // Visit tracking must never prevent the furniture site from loading.
+    }
+  }, []);
   const items = category ? products.filter((product) => product.category === category) : []; const product = items[item];
   const option = (value: Product) => `Option ${products.filter((product) => product.category === value.category).findIndex((product) => product.id === value.id) + 1}`;
   const open = (next: Category, target?: string) => { const nextItems = products.filter((product) => product.category === next); setCategory(next); setItem(target ? Math.max(0, nextItems.findIndex((product) => product.id === target)) : 0); setPhoto(0); window.scrollTo({ top: 0, behavior: "smooth" }); };
