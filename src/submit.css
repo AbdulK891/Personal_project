@@ -1,0 +1,30 @@
+.submit-area {
+  margin-top: 20px;
+}
+
+.submit-picks {
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--ink);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+
+.submit-picks:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.submit-success,
+.submit-error {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 12px;
+}
+
+.submit-success { color: var(--sage); }
+.submit-error { color: var(--rose); }
